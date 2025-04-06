@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts"
   DTS:refId="Package"
   DTS:CreationDate="4/6/2025 11:34:16 AM"
@@ -11,9 +11,521 @@
   DTS:LocaleID="10250"
   DTS:ObjectName="Package"
   DTS:PackageType="5"
-  DTS:VersionGUID="{80F0B516-3394-4AF2-9E46-4218CB506619}">
+  DTS:VersionBuild="10"
+  DTS:VersionGUID="{F3552792-4561-4456-941D-AF77EC2547A4}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
+  <DTS:ConnectionManagers>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[DESKTOP-P5SF2MA.bd_mantenimiento_equipos]"
+      DTS:CreationName="OLEDB"
+      DTS:DTSID="{D5D3B4A6-9F64-4006-931E-0BE872D670B6}"
+      DTS:ObjectName="DESKTOP-P5SF2MA.bd_mantenimiento_equipos">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:ConnectRetryCount="1"
+          DTS:ConnectRetryInterval="5"
+          DTS:ConnectionString="Data Source=DESKTOP-P5SF2MA;Initial Catalog=bd_mantenimiento_equipos;Provider=SQLOLEDB.1;Integrated Security=SSPI;Application Name=SSIS-Package-{D5D3B4A6-9F64-4006-931E-0BE872D670B6}DESKTOP-P5SF2MA.bd_mantenimiento_equipos;Auto Translate=False;" />
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[DESKTOP-P5SF2MA.bd_matenimiento_equipos_bi]"
+      DTS:CreationName="OLEDB"
+      DTS:DTSID="{4E1093EF-04DA-4B32-A650-9FF42DA42F35}"
+      DTS:ObjectName="DESKTOP-P5SF2MA.bd_matenimiento_equipos_bi">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:ConnectRetryCount="1"
+          DTS:ConnectRetryInterval="5"
+          DTS:ConnectionString="Data Source=DESKTOP-P5SF2MA;Initial Catalog=bd_matenimiento_equipos_bi;Provider=SQLOLEDB.1;Integrated Security=SSPI;Application Name=SSIS-Package-{4E1093EF-04DA-4B32-A650-9FF42DA42F35}DESKTOP-P5SF2MA.bd_matenimiento_equipos_bi;Auto Translate=False;" />
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+  </DTS:ConnectionManagers>
   <DTS:Variables />
-  <DTS:Executables />
+  <DTS:Executables>
+    <DTS:Executable
+      DTS:refId="Package\Limpiar tablas y reiniciar ID"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:Description="Tarea Ejecutar SQL"
+      DTS:DTSID="{4C8DA6D4-1C97-4613-8E93-E541CF25A8E0}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Limpiar tablas y reiniciar ID"
+      DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2022; © 2022 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{4E1093EF-04DA-4B32-A650-9FF42DA42F35}"
+          SQLTask:SqlStatementSource="DELETE FROM fact_table_costo_mantenimientos;&#xA;DBCC CHECKIDENT ('fact_table_costo_mantenimientos', RESEED, 0);&#xA;&#xA;DELETE FROM dim_equipos;&#xA;DBCC CHECKIDENT ('dim_equipos', RESEED, 0);&#xA;&#xA;DELETE FROM dim_tecnicos;&#xA;DBCC CHECKIDENT ('dim_tecnicos', RESEED, 0);&#xA;&#xA;DELETE FROM dim_fechas;&#xA;DBCC CHECKIDENT ('dim_fechas', RESEED, 0);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\Poblar dimensiones"
+      DTS:CreationName="Microsoft.Pipeline"
+      DTS:Description="Tarea Flujo de datos"
+      DTS:DTSID="{BB98F550-B7E1-431E-9401-2243C6012C58}"
+      DTS:ExecutableType="Microsoft.Pipeline"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Poblar dimensiones"
+      DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <pipeline
+          version="1">
+          <components>
+            <component
+              refId="Package\Poblar dimensiones\Destino de OLE DB"
+              componentClassID="Microsoft.OLEDBDestination"
+              contactInfo="Destino de OLE DB;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; Todos los derechos reservados; http://www.microsoft.com/sql/support;4"
+              description="Destino de OLE DB"
+              name="Destino de OLE DB"
+              usesDispositions="true"
+              version="4">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="Número de segundos antes de que se agote el tiempo de espera de un comando. Un valor de 0 indica un tiempo de espera infinito."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Especifica el nombre del objeto de base de datos usado para abrir un conjunto de filas."
+                  name="OpenRowset">[dbo].[dim_equipos]</property>
+                <property
+                  dataType="System.String"
+                  description="Especifica la variable que contiene el nombre del objeto de base de datos usado para abrir un conjunto de filas."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="Comando SQL para ejecutar."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Especifica la página de códigos de columna para utilizar cuando la información de página de códigos no está disponible en el origen de datos."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Fuerza el uso del valor de la propiedad DefaultCodePage al describir datos de caracteres."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Especifica el modo utilizado para obtener acceso a la base de datos."
+                  name="AccessMode"
+                  typeConverter="AccessMode">0</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indica si los valores proporcionados para columnas de identidad se van a copiar al destino. Si es False, los valores de las columnas de identidad se generan automáticamente en el destino. Solo se aplica si está activada la carga rápida."
+                  name="FastLoadKeepIdentity">false</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indica si las columnas que contienen NULL tendrán NULL insertado en el destino. Si es False, las columnas que contienen NULL tendrán sus valores predeterminados insertados en el destino. Solo se aplica si está activada la carga rápida."
+                  name="FastLoadKeepNulls">false</property>
+                <property
+                  dataType="System.String"
+                  description="Especifica opciones para usar con la carga rápida. Solo se aplica si está activada la carga rápida."
+                  name="FastLoadOptions"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Especifica cuándo se emiten confirmaciones durante la inserción de datos. El valor 0 especifica que se emitirá una confirmación al final de la inserción de datos. Solo se aplica si está activada la carga rápida."
+                  name="FastLoadMaxInsertCommitSize">2147483647</property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Poblar dimensiones\Destino de OLE DB.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[DESKTOP-P5SF2MA.bd_matenimiento_equipos_bi]"
+                  connectionManagerRefId="Package.ConnectionManagers[DESKTOP-P5SF2MA.bd_matenimiento_equipos_bi]"
+                  description="La conexión de tiempo de ejecución OLE DB usada para obtener acceso a la base de datos."
+                  name="OleDbConnection" />
+              </connections>
+              <inputs>
+                <input
+                  refId="Package\Poblar dimensiones\Destino de OLE DB.Inputs[Entrada de destino de OLE DB]"
+                  errorOrTruncationOperation="Insertar"
+                  errorRowDisposition="FailComponent"
+                  hasSideEffects="true"
+                  name="Entrada de destino de OLE DB">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Poblar dimensiones\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[id_equipo]"
+                      cachedDataType="i4"
+                      cachedName="id_equipo"
+                      externalMetadataColumnId="Package\Poblar dimensiones\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[id_equipo]"
+                      lineageId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[id_equipo]" />
+                    <inputColumn
+                      refId="Package\Poblar dimensiones\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[nombre_equipo]"
+                      cachedCodepage="1252"
+                      cachedDataType="str"
+                      cachedLength="100"
+                      cachedName="nombre_equipo"
+                      externalMetadataColumnId="Package\Poblar dimensiones\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[nombre_equipo]"
+                      lineageId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[nombre_equipo]" />
+                    <inputColumn
+                      refId="Package\Poblar dimensiones\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[modelo]"
+                      cachedCodepage="1252"
+                      cachedDataType="str"
+                      cachedLength="100"
+                      cachedName="modelo"
+                      externalMetadataColumnId="Package\Poblar dimensiones\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[modelo]"
+                      lineageId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[modelo]" />
+                  </inputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Poblar dimensiones\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[id]"
+                      dataType="i4"
+                      name="id" />
+                    <externalMetadataColumn
+                      refId="Package\Poblar dimensiones\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[id_equipo]"
+                      dataType="i4"
+                      name="id_equipo" />
+                    <externalMetadataColumn
+                      refId="Package\Poblar dimensiones\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[nombre_equipo]"
+                      codePage="1252"
+                      dataType="str"
+                      length="100"
+                      name="nombre_equipo" />
+                    <externalMetadataColumn
+                      refId="Package\Poblar dimensiones\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[modelo]"
+                      codePage="1252"
+                      dataType="str"
+                      length="100"
+                      name="modelo" />
+                  </externalMetadataColumns>
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Poblar dimensiones\Destino de OLE DB.Outputs[Salida de error de destino de OLE DB]"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="Salida de error de destino de OLE DB"
+                  synchronousInputId="Package\Poblar dimensiones\Destino de OLE DB.Inputs[Entrada de destino de OLE DB]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Poblar dimensiones\Destino de OLE DB.Outputs[Salida de error de destino de OLE DB].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Poblar dimensiones\Destino de OLE DB.Outputs[Salida de error de destino de OLE DB].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Poblar dimensiones\Destino de OLE DB.Outputs[Salida de error de destino de OLE DB].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Poblar dimensiones\Destino de OLE DB.Outputs[Salida de error de destino de OLE DB].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Poblar dimensiones\Origen de OLE DB"
+              componentClassID="Microsoft.OLEDBSource"
+              contactInfo="Origen de OLE DB;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; Todos los derechos reservados; http://www.microsoft.com/sql/support;7"
+              description="Origen de OLE DB"
+              name="Origen de OLE DB"
+              usesDispositions="true"
+              version="7">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="Número de segundos antes de que se agote el tiempo de espera de un comando. Un valor de 0 indica un tiempo de espera infinito."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Especifica el nombre del objeto de base de datos usado para abrir un conjunto de filas."
+                  name="OpenRowset"></property>
+                <property
+                  dataType="System.String"
+                  description="Especifica la variable que contiene el nombre del objeto de base de datos usado para abrir un conjunto de filas."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="Comando SQL para ejecutar."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT
+	id as 'id_equipo',
+	nombre as 'nombre_equipo',
+	modelo as 'modelo'
+FROM equipos;</property>
+                <property
+                  dataType="System.String"
+                  description="Variable que contiene el comando SQL para ejecutar."
+                  name="SqlCommandVariable"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Especifica la página de códigos de columna para utilizar cuando la información de página de códigos no está disponible en el origen de datos."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Fuerza el uso del valor de la propiedad DefaultCodePage al describir datos de caracteres."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Especifica el modo utilizado para obtener acceso a la base de datos."
+                  name="AccessMode"
+                  typeConverter="AccessMode">2</property>
+                <property
+                  dataType="System.String"
+                  description="Asignaciones entre los parámetros del comando SQL y las variables."
+                  name="ParameterMapping"></property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Poblar dimensiones\Origen de OLE DB.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[DESKTOP-P5SF2MA.bd_mantenimiento_equipos]"
+                  connectionManagerRefId="Package.ConnectionManagers[DESKTOP-P5SF2MA.bd_mantenimiento_equipos]"
+                  description="La conexión de tiempo de ejecución OLE DB usada para obtener acceso a la base de datos."
+                  name="OleDbConnection" />
+              </connections>
+              <outputs>
+                <output
+                  refId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de origen de OLE DB]"
+                  name="Salida de origen de OLE DB">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[id_equipo]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversión"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[id_equipo]"
+                      lineageId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[id_equipo]"
+                      name="id_equipo"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[nombre_equipo]"
+                      codePage="1252"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversión"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[nombre_equipo]"
+                      length="100"
+                      lineageId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[nombre_equipo]"
+                      name="nombre_equipo"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[modelo]"
+                      codePage="1252"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversión"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[modelo]"
+                      length="100"
+                      lineageId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[modelo]"
+                      name="modelo"
+                      truncationRowDisposition="FailComponent" />
+                  </outputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[id_equipo]"
+                      dataType="i4"
+                      name="id_equipo" />
+                    <externalMetadataColumn
+                      refId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[nombre_equipo]"
+                      codePage="1252"
+                      dataType="str"
+                      length="100"
+                      name="nombre_equipo" />
+                    <externalMetadataColumn
+                      refId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[modelo]"
+                      codePage="1252"
+                      dataType="str"
+                      length="100"
+                      name="modelo" />
+                  </externalMetadataColumns>
+                </output>
+                <output
+                  refId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB]"
+                  isErrorOut="true"
+                  name="Salida de error de origen de OLE DB">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[id_equipo]"
+                      dataType="i4"
+                      lineageId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[id_equipo]"
+                      name="id_equipo" />
+                    <outputColumn
+                      refId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[nombre_equipo]"
+                      codePage="1252"
+                      dataType="str"
+                      length="100"
+                      lineageId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[nombre_equipo]"
+                      name="nombre_equipo" />
+                    <outputColumn
+                      refId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[modelo]"
+                      codePage="1252"
+                      dataType="str"
+                      length="100"
+                      lineageId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[modelo]"
+                      name="modelo" />
+                    <outputColumn
+                      refId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+          </components>
+          <paths>
+            <path
+              refId="Package\Poblar dimensiones.Paths[Salida de origen de OLE DB]"
+              endId="Package\Poblar dimensiones\Destino de OLE DB.Inputs[Entrada de destino de OLE DB]"
+              name="Salida de origen de OLE DB"
+              startId="Package\Poblar dimensiones\Origen de OLE DB.Outputs[Salida de origen de OLE DB]" />
+          </paths>
+        </pipeline>
+      </DTS:ObjectData>
+    </DTS:Executable>
+  </DTS:Executables>
+  <DTS:PrecedenceConstraints>
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Restricción]"
+      DTS:CreationName=""
+      DTS:DTSID="{85C2A295-84CC-41C5-9BAE-54A9AB3B146E}"
+      DTS:From="Package\Limpiar tablas y reiniciar ID"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Restricción"
+      DTS:To="Package\Poblar dimensiones" />
+  </DTS:PrecedenceConstraints>
+  <DTS:DesignTimeProperties><![CDATA[<?xml version="1.0"?>
+<!--Esta sección CDATA contiene la información de diseño del paquete. Esta sección incluye información como, por ejemplo, las coordenadas (x,y), el ancho y el alto.-->
+<!--Si edita manualmente esta sección y comete un error, puede eliminarlo. -->
+<!--El paquete podrá cargarse normalmente, pero se perderá la información de diseño anterior y el diseñador reorganizará los elementos automáticamente en la superficie de diseño.-->
+<Objects
+  Version="8">
+  <!--Cada uno de los nodos siguientes contiene propiedades que no afectan al comportamiento en tiempo de ejecución.-->
+  <Package
+    design-time-name="Package">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        <NodeLayout
+          Size="208,42"
+          Id="Package\Limpiar tablas y reiniciar ID"
+          TopLeft="207,70" />
+        <NodeLayout
+          Size="170,42"
+          Id="Package\Poblar dimensiones"
+          TopLeft="245,182" />
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Restricción]"
+          TopLeft="311,112">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="19,70"
+              Start="0,0"
+              End="19,62.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,31" />
+                  <mssgle:CubicBezierSegment
+                    Point1="0,31"
+                    Point2="0,35"
+                    Point3="4,35" />
+                  <mssgle:LineSegment
+                    End="15,35" />
+                  <mssgle:CubicBezierSegment
+                    Point1="15,35"
+                    Point2="19,35"
+                    Point3="19,39" />
+                  <mssgle:LineSegment
+                    End="19,62.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </Package>
+  <TaskHost
+    design-time-name="Package\Poblar dimensiones">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        <NodeLayout
+          Size="164,42"
+          Id="Package\Poblar dimensiones\Origen de OLE DB"
+          TopLeft="215,88" />
+        <NodeLayout
+          Size="168,42"
+          Id="Package\Poblar dimensiones\Destino de OLE DB"
+          TopLeft="203,249" />
+        <EdgeLayout
+          Id="Package\Poblar dimensiones.Paths[Salida de origen de OLE DB]"
+          TopLeft="297,130">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="-10,119"
+              Start="0,0"
+              End="-10,111.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,55.5" />
+                  <mssgle:CubicBezierSegment
+                    Point1="0,55.5"
+                    Point2="0,59.5"
+                    Point3="-4,59.5" />
+                  <mssgle:LineSegment
+                    End="-6,59.5" />
+                  <mssgle:CubicBezierSegment
+                    Point1="-6,59.5"
+                    Point2="-10,59.5"
+                    Point3="-10,63.5" />
+                  <mssgle:LineSegment
+                    End="-10,111.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </TaskHost>
+  <PipelineComponentMetadata
+    design-time-name="Package\Poblar dimensiones\Origen de OLE DB">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+  <PipelineComponentMetadata
+    design-time-name="Package\Poblar dimensiones\Destino de OLE DB">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+      <Property>
+        <Name>TableInfoObjectType</Name>
+        <Value
+          type="q2:string">Table</Value>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+</Objects>]]></DTS:DesignTimeProperties>
 </DTS:Executable>
